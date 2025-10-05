@@ -6,10 +6,20 @@ cmds = ["pip install -r requirements.txt"]
 
 [phases.build]
 cmds = [
-    "cd frontend && npm install && npm run build && cd ..",
+    "echo '=== Building Frontend ==='",
+    "cd frontend && npm install && npm run build",
+    "echo '=== Frontend build complete ==='",
+    "ls -la dist/",
+    "cd ..",
+    "echo '=== Creating staticfiles directory ==='",
     "mkdir -p staticfiles",
-    "cp -r frontend/dist/* staticfiles/ || true",
-    "python manage.py collectstatic --noinput --clear"
+    "echo '=== Copying frontend build to staticfiles ==='",
+    "cp -rv frontend/dist/* staticfiles/",
+    "ls -la staticfiles/",
+    "echo '=== Running collectstatic ==='",
+    "python manage.py collectstatic --noinput --clear",
+    "echo '=== Final staticfiles contents ==='",
+    "ls -la staticfiles/"
 ]
 
 [start]
