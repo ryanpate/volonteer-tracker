@@ -21,8 +21,17 @@ ALLOWED_HOSTS = os.environ.get(
 
 # Add Railway domain automatically
 railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+railway_static_url = os.environ.get('RAILWAY_STATIC_URL')
+
 if railway_domain:
     ALLOWED_HOSTS.append(railway_domain)
+if railway_static_url:
+    # Extract domain from URL like https://domain.railway.app
+    domain = railway_static_url.replace('https://', '').replace('http://', '')
+    ALLOWED_HOSTS.append(domain)
+
+# Also allow all railway.app subdomains
+ALLOWED_HOSTS.append('.railway.app')
 
 # Application definition
 INSTALLED_APPS = [
