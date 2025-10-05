@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -65,4 +66,8 @@ urlpatterns = [
     # Health check
     path('health/',
          lambda request: __import__('django.http').JsonResponse({'status': 'ok'})),
+
+    # Serve React App - MUST be last to catch all remaining routes
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'),
+            name='frontend'),
 ]
