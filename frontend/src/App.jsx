@@ -9,6 +9,7 @@ import CreateInteraction from './pages/CreateInteraction';
 import TeamMembers from './pages/TeamMembers';
 import Profile from './pages/Profile';
 import Layout from './components/Layout';
+import './styles/cherry-hills-theme.css';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();

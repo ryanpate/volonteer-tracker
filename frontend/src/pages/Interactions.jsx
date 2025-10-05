@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { interactionsAPI } from '../services/api';
 import { format } from 'date-fns';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiMessageSquare } from 'react-icons/fi';
 
 export default function Interactions() {
   const [interactions, setInteractions] = useState([]);
@@ -25,13 +25,27 @@ export default function Interactions() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="spinner mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading interactions...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">All Interactions</h1>
+      {/* Header with accent bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-10 bg-gradient-to-b from-[#2A8B88] to-[#1A6B68] rounded-full"></div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">All Interactions</h1>
+            <p className="text-gray-600 mt-1">{interactions.length} total interactions</p>
+          </div>
+        </div>
         <Link to="/interactions/new" className="btn-primary flex items-center">
           <FiPlus className="mr-2" />
           New Interaction
@@ -40,16 +54,30 @@ export default function Interactions() {
 
       <div className="space-y-4">
         {(interactions || []).map(interaction => (
-          <div key={interaction.id} className="card">
-            <div className="flex justify-between">
+          <div key={interaction.id} className="interaction-item">
+            <div className="flex flex-col sm:flex-row justify-between gap-3">
               <div className="flex-1">
-                <Link to={`/volunteers/${interaction.volunteer}`} className="font-semibold text-primary-600 hover:text-primary-700">
+                <Link 
+                  to={`/volunteers/${interaction.volunteer}`} 
+                  className="font-semibold text-[#9AAF92] hover:text-[#6B8263] transition-colors text-lg"
+                >
                   {interaction.volunteer_name}
                 </Link>
-                <p className="text-sm text-gray-600">
-                  {format(new Date(interaction.interaction_date), 'MMM d, yyyy')} by {interaction.team_member_name}
+                <p className="text-sm text-gray-600 mt-1">
+                  {format(new Date(interaction.interaction_date), 'MMMM d, yyyy')} • by {interaction.team_member_name}
                 </p>
-                <p className="text-gray-700 mt-2">{interaction.discussion_notes}</p>
+                <p className="text-gray-700 mt-2 leading-relaxed">{interaction.discussion_notes}</p>
+                
+                {/* Topics */}
+                {interaction.topics && interaction.topics.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {interaction.topics.map((topic, idx) => (
+                      <span key={idx} className="badge badge-sage">
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -57,8 +85,14 @@ export default function Interactions() {
       </div>
 
       {interactions.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No interactions found</p>
+        <div className="text-center py-16">
+          <FiMessageSquare className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No interactions yet</h3>
+          <p className="text-gray-500 mb-6">Get started by logging your first volunteer interaction</p>
+          <Link to="/interactions/new" className="btn-primary inline-flex items-center">
+            <FiPlus className="mr-2" />
+            Log First Interaction
+          </Link>
         </div>
       )}
     </div>

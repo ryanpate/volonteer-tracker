@@ -35,23 +35,41 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center login-container px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Logo and Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary-600 mb-2">Volunteer Tracker</h1>
-          <p className="text-gray-600">Worship Arts Team Leadership Portal</p>
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#9AAF92] to-[#6B8263] mb-4 shadow-lg">
+            <span className="text-white text-5xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
+              CH
+            </span>
+          </div>
+          <h1 className="text-4xl font-bold mb-2" style={{ 
+            background: 'linear-gradient(135deg, #9AAF92 0%, #6B8263 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Volunteer Tracker
+          </h1>
+          <p className="text-gray-600 font-medium">Cherry Hills Church</p>
+          <p className="text-sm text-gray-500 mt-1">Worship Arts Team Leadership Portal</p>
         </div>
 
-        <div className="card">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Sign In</h2>
+        {/* Login Card */}
+        <div className="login-card">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+            <p className="text-sm text-gray-600 mt-1">Sign in to continue</p>
+          </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-              {error}
+            <div className="alert alert-error mb-6">
+              <strong>Login Failed:</strong> {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="label">Username</label>
               <div className="relative">
@@ -63,6 +81,7 @@ export default function Login() {
                   className="input pl-10"
                   placeholder="Enter your username"
                   required
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -78,6 +97,7 @@ export default function Login() {
                   className="input pl-10"
                   placeholder="Enter your password"
                   required
+                  autoComplete="current-password"
                 />
               </div>
             </div>
@@ -85,14 +105,39 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed py-3"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Track volunteer interactions and build stronger connections
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Track volunteer interactions and build stronger connections in your ministry
+            </p>
+            <p className="text-xs text-gray-500 mt-3 italic">
+              "Pursuing life together with Jesus in community, in formation, and on mission"
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            Need help? Contact{' '}
+            <a href="mailto:chc@cherryhillsfamily.org" className="text-[#9AAF92] hover:text-[#6B8263] font-medium">
+              chc@cherryhillsfamily.org
+            </a>
           </p>
         </div>
       </div>

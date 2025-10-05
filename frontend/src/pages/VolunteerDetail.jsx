@@ -59,24 +59,39 @@ export default function VolunteerDetail() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12">
-      <div className="w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="spinner mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading volunteer details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!volunteer) {
-    return <div className="text-center py-12">
-      <p className="text-gray-500">Volunteer not found</p>
-    </div>;
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Volunteer not found</p>
+        <Link to="/volunteers" className="btn-primary mt-4 inline-block">
+          Back to Volunteers
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{volunteer.full_name}</h1>
-          <p className="text-gray-600 mt-1">{interactions.length} interactions recorded</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-12 bg-gradient-to-b from-[#9AAF92] to-[#6B8263] rounded-full"></div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{volunteer.full_name}</h1>
+            <p className="text-gray-600 mt-1">
+              {interactions.length} interaction{interactions.length !== 1 ? 's' : ''} recorded
+            </p>
+          </div>
         </div>
         <Link to={`/interactions/new?volunteer=${id}`} className="btn-primary">
           Log Interaction
@@ -84,17 +99,24 @@ export default function VolunteerDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Contact Info */}
+        {/* Left Column - Contact Info & AI Summary */}
         <div className="space-y-6">
+          {/* Contact Information */}
           <div className="card">
-            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
-            <div className="space-y-3">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-6 bg-[#3B7EA1] rounded-full"></div>
+              <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+            </div>
+            <div className="space-y-4">
               {volunteer.email && (
                 <div className="flex items-start">
-                  <FiMail className="h-5 w-5 text-gray-400 mt-0.5 mr-3" />
-                  <div>
-                    <p className="text-sm text-gray-600">Email</p>
-                    <a href={`mailto:${volunteer.email}`} className="text-primary-600 hover:text-primary-700">
+                  <FiMail className="h-5 w-5 text-gray-400 mt-0.5 mr-3 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-gray-600 mb-1">Email</p>
+                    <a 
+                      href={`mailto:${volunteer.email}`} 
+                      className="text-[#9AAF92] hover:text-[#6B8263] font-medium break-all"
+                    >
                       {volunteer.email}
                     </a>
                   </div>
@@ -102,10 +124,13 @@ export default function VolunteerDetail() {
               )}
               {volunteer.phone && (
                 <div className="flex items-start">
-                  <FiPhone className="h-5 w-5 text-gray-400 mt-0.5 mr-3" />
+                  <FiPhone className="h-5 w-5 text-gray-400 mt-0.5 mr-3 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-gray-600">Phone</p>
-                    <a href={`tel:${volunteer.phone}`} className="text-primary-600 hover:text-primary-700">
+                    <p className="text-sm text-gray-600 mb-1">Phone</p>
+                    <a 
+                      href={`tel:${volunteer.phone}`} 
+                      className="text-[#9AAF92] hover:text-[#6B8263] font-medium"
+                    >
                       {volunteer.phone}
                     </a>
                   </div>
@@ -113,10 +138,22 @@ export default function VolunteerDetail() {
               )}
               {volunteer.address && (
                 <div className="flex items-start">
-                  <FiMapPin className="h-5 w-5 text-gray-400 mt-0.5 mr-3" />
+                  <FiMapPin className="h-5 w-5 text-gray-400 mt-0.5 mr-3 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-gray-600">Address</p>
+                    <p className="text-sm text-gray-600 mb-1">Address</p>
                     <p className="text-gray-900">{volunteer.address}</p>
+                  </div>
+                </div>
+              )}
+              {volunteer.teams && volunteer.teams.length > 0 && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">Teams</p>
+                  <div className="flex flex-wrap gap-2">
+                    {volunteer.teams.map((team, idx) => (
+                      <span key={idx} className="badge badge-teal">
+                        {team}
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
@@ -125,13 +162,26 @@ export default function VolunteerDetail() {
 
           {/* AI Summary */}
           <div className="card">
-            <h2 className="text-lg font-semibold mb-4">AI Summary</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-6 bg-[#B25667] rounded-full"></div>
+              <h2 className="text-lg font-semibold text-gray-900">AI Summary</h2>
+            </div>
             {summary ? (
               <div className="prose prose-sm max-w-none">
-                <p className="text-gray-700 whitespace-pre-wrap">{summary}</p>
+                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{summary}</p>
+                <button
+                  onClick={loadAISummary}
+                  disabled={loadingSummary}
+                  className="btn-secondary mt-4 text-sm"
+                >
+                  Regenerate Summary
+                </button>
               </div>
             ) : (
               <div className="text-center py-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Generate an AI-powered summary of all interactions with this volunteer
+                </p>
                 <button
                   onClick={loadAISummary}
                   disabled={loadingSummary}
@@ -154,14 +204,17 @@ export default function VolunteerDetail() {
         {/* Right Column - Interaction History */}
         <div className="lg:col-span-2">
           <div className="card">
-            <h2 className="text-lg font-semibold mb-4">Interaction History</h2>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-6 bg-[#2A8B88] rounded-full"></div>
+              <h2 className="text-lg font-semibold text-gray-900">Interaction History</h2>
+            </div>
             {interactions.length > 0 ? (
               <div className="space-y-6">
                 {(interactions || []).map((interaction) => (
-                  <div key={interaction.id} className="border-l-4 border-primary-500 pl-4 py-2">
-                    <div className="flex justify-between items-start mb-2">
+                  <div key={interaction.id} className="interaction-item">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-semibold text-gray-900 text-lg">
                           {format(new Date(interaction.interaction_date), 'MMMM d, yyyy')}
                         </p>
                         <p className="text-sm text-gray-600">
@@ -169,36 +222,47 @@ export default function VolunteerDetail() {
                         </p>
                       </div>
                       {interaction.needs_followup && !interaction.followup_completed && (
-                        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
+                        <span className="badge badge-gold">
                           Follow-up needed
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-700 mb-2">{interaction.discussion_notes}</p>
+                    
+                    <p className="text-gray-700 leading-relaxed mb-3">{interaction.discussion_notes}</p>
+                    
+                    {/* Topics */}
                     {interaction.topics && interaction.topics.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-2">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {interaction.topics.map((topic, idx) => (
-                          <span key={idx} className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
+                          <span key={idx} className="badge badge-sage">
                             {topic}
                           </span>
                         ))}
                       </div>
                     )}
+                    
+                    {/* Follow-up Info */}
                     {interaction.needs_followup && interaction.followup_date && (
-                      <div className="flex items-center text-sm text-gray-600 mt-2">
-                        <FiCalendar className="h-4 w-4 mr-1" />
-                        Follow-up: {format(new Date(interaction.followup_date), 'MMM d, yyyy')}
-                        {interaction.followup_notes && ` - ${interaction.followup_notes}`}
+                      <div className="flex items-start gap-2 text-sm text-gray-600 mt-3 pt-3 border-t border-gray-200">
+                        <FiCalendar className="h-4 w-4 mt-0.5 flex-shrink-0 text-[#F0B545]" />
+                        <div>
+                          <span className="font-medium">Follow-up: </span>
+                          {format(new Date(interaction.followup_date), 'MMM d, yyyy')}
+                          {interaction.followup_notes && (
+                            <span className="block mt-1 text-gray-700">{interaction.followup_notes}</span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <FiMessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">No interactions recorded yet</p>
-                <Link to={`/interactions/new?volunteer=${id}`} className="btn-primary mt-4 inline-block">
+              <div className="text-center py-16">
+                <FiMessageSquare className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No interactions recorded yet</h3>
+                <p className="text-gray-500 mb-6">Start building a connection by logging your first interaction</p>
+                <Link to={`/interactions/new?volunteer=${id}`} className="btn-primary inline-block">
                   Log First Interaction
                 </Link>
               </div>
