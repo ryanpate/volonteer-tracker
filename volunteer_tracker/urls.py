@@ -4,8 +4,10 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from core.views import TeamMemberViewSet, AuthViewSet
+from core.admin_views import AdminDashboardViewSet, SettingsView
 from volunteers.views import VolunteerViewSet
 from interactions.views import InteractionViewSet
+from interactions.admin_views import InteractionAdminViewSet
 from core.dashboard_views import (
     DashboardOverviewView, DashboardTrendsView, DashboardTeamActivityView,
     DashboardVolunteersNeedCheckinView, DashboardRecentInteractionsView,
@@ -15,13 +17,21 @@ from core.dashboard_views import (
 
 # Create router and register viewsets
 router = DefaultRouter()
+
+# Regular endpoints (authenticated users)
 router.register(r'team-members', TeamMemberViewSet, basename='team-member')
 router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'volunteers', VolunteerViewSet, basename='volunteer')
 router.register(r'interactions', InteractionViewSet, basename='interaction')
 
+# Admin endpoints (admin users only)
+router.register(r'admin/dashboard', AdminDashboardViewSet,
+                basename='admin-dashboard')
+router.register(r'admin/interactions', InteractionAdminViewSet,
+                basename='admin-interaction')
+
 urlpatterns = [
-    # Admin
+    # Django Admin
     path('admin/', admin.site.urls),
 
     # JWT Authentication
@@ -30,6 +40,9 @@ urlpatterns = [
 
     # API endpoints
     path('api/', include(router.urls)),
+
+    # Admin Settings
+    path('api/admin/settings/', SettingsView.as_view(), name='admin-settings'),
 
     # Dashboard endpoints
     path('api/dashboard/overview/', DashboardOverviewView.as_view(),

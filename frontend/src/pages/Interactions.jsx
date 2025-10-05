@@ -15,7 +15,10 @@ export default function Interactions() {
   const loadInteractions = async () => {
     try {
       const response = await interactionsAPI.getAll();
-      setInteractions(response.data.interactions || []);
+      // Django REST Framework returns paginated data in 'results'
+      // Handle both paginated and non-paginated responses
+      const interactionsData = response.data.results || response.data.interactions || response.data || [];
+      setInteractions(interactionsData);
     } catch (error) {
       console.error('Error loading interactions:', error);
       setInteractions([]);
