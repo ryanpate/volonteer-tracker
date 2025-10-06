@@ -350,4 +350,4 @@ Please provide a warm, pastoral summary that helps leadership understand where t
             logger.error(f"Anthropic API error: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
-                raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
+            raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
