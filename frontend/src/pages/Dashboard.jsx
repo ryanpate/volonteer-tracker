@@ -61,42 +61,47 @@ export default function Dashboard() {
   }
 
   const stats = [
-    { 
-      name: 'Total Volunteers', 
-      value: overview?.total_volunteers || 0, 
-      icon: FiUsers, 
-      color: 'bg-[#3B7EA1]',
-      accentClass: 'accent-blue'
-    },
-    { 
-      name: 'Total Interactions', 
-      value: overview?.total_interactions || 0, 
-      icon: FiMessageSquare, 
-      color: 'bg-[#2A8B88]',
-      accentClass: 'accent-teal'
-    },
-    { 
-      name: 'This Month', 
-      value: overview?.interactions_this_month || 0, 
-      icon: FiTrendingUp, 
-      color: 'bg-[#B25667]',
-      accentClass: 'accent-rose'
-    },
-    { 
-      name: 'Pending Follow-ups', 
-      value: overview?.pending_followups || 0, 
-      icon: FiClock, 
-      color: 'bg-[#F0B545]',
-      accentClass: 'accent-gold'
-    },
-    { 
-      name: 'Overdue', 
-      value: overview?.overdue_followups || 0, 
-      icon: FiAlertCircle, 
-      color: 'bg-[#C55A5A]',
-      accentClass: 'accent-rose'
-    },
-  ];
+      { 
+        name: 'Total Volunteers', 
+        value: overview?.total_volunteers || 0, 
+        icon: FiUsers, 
+        color: 'bg-[#3B7EA1]',
+        accentClass: 'accent-blue',
+        link: '/volunteers'
+      },
+      { 
+        name: 'Total Interactions', 
+        value: overview?.total_interactions || 0, 
+        icon: FiMessageSquare, 
+        color: 'bg-[#2A8B88]',
+        accentClass: 'accent-teal',
+        link: '/interactions'
+      },
+      { 
+        name: 'This Month', 
+        value: overview?.interactions_this_month || 0, 
+        icon: FiTrendingUp, 
+        color: 'bg-[#B25667]',
+        accentClass: 'accent-rose',
+        link: '/interactions?filter=this-month'
+      },
+      { 
+        name: 'Pending Follow-ups', 
+        value: overview?.pending_followups || 0, 
+        icon: FiClock, 
+        color: 'bg-[#F0B545]',
+        accentClass: 'accent-gold',
+        link: '/interactions?filter=followup'
+      },
+      { 
+        name: 'Overdue', 
+        value: overview?.overdue_followups || 0, 
+        icon: FiAlertCircle, 
+        color: 'bg-[#C55A5A]',
+        accentClass: 'accent-rose',
+        link: '/interactions?filter=overdue'
+      },
+    ];
 
   return (
     <div className="space-y-6">
