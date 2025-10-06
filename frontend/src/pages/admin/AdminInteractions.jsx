@@ -75,6 +75,21 @@ export default function AdminInteractions() {
         topics: formData.topics ? formData.topics.split(',').map(t => t.trim()) : [],
       };
 
+      // If needs_followup is false, remove followup fields
+      if (!dataToSubmit.needs_followup) {
+        delete dataToSubmit.followup_date;
+        delete dataToSubmit.followup_notes;
+        delete dataToSubmit.followup_completed;
+      } else {
+        // If needs_followup is true but fields are empty, send null instead of empty string
+        if (!dataToSubmit.followup_date) {
+          dataToSubmit.followup_date = null;
+        }
+        if (!dataToSubmit.followup_notes) {
+          dataToSubmit.followup_notes = '';
+        }
+      }
+
       if (editingInteraction) {
         await interactionsAPI.update(editingInteraction.id, dataToSubmit);
         alert('Interaction updated successfully');
@@ -84,7 +99,8 @@ export default function AdminInteractions() {
       loadData();
     } catch (error) {
       console.error('Error saving interaction:', error);
-      alert('Failed to save interaction: ' + (error.response?.data?.detail || error.message));
+      console.error('Response data:', error.response?.data);
+      alert('Failed to save interaction: ' + (error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message));
     }
   };
 
@@ -269,7 +285,7 @@ export default function AdminInteractions() {
                   {formData.needs_followup && (
                     <div className="space-y-4 pl-6 border-l-4 border-[#F0B545] bg-[#FEF3D9] bg-opacity-20 rounded-r-lg p-4">
                       <div>
-                        <label className="label">Follow-up Date</label>
+                        <label className="label">Follow-up Date (optional)</label>
                         <input
                           type="date"
                           value={formData.followup_date}
@@ -278,12 +294,13 @@ export default function AdminInteractions() {
                         />
                       </div>
                       <div>
-                        <label className="label">Follow-up Notes</label>
+                        <label className="label">Follow-up Notes (optional)</label>
                         <textarea
                           value={formData.followup_notes}
                           onChange={(e) => setFormData({ ...formData, followup_notes: e.target.value })}
                           rows="3"
                           className="input"
+                          placeholder="Optional notes about the follow-up needed..."
                         />
                       </div>
                       <div className="flex items-center">
