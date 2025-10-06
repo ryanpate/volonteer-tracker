@@ -321,12 +321,10 @@ Please provide a warm, pastoral summary that helps leadership understand where t
             logger.info(f"Anthropic version: {anthropic.__version__}")
             logger.info("Creating custom HTTP client...")
 
-            # Create a custom httpx client that ignores environment proxy settings
+            # Create a custom httpx client without proxy parameters
             http_client = httpx.Client(
                 timeout=60.0,
-                # Explicitly disable proxy detection from environment
-                proxies=None,
-                trust_env=False  # Don't trust environment variables
+                trust_env=False  # Don't trust environment variables for proxies
             )
 
             logger.info("Creating Anthropic client with custom HTTP client...")
@@ -352,4 +350,4 @@ Please provide a warm, pastoral summary that helps leadership understand where t
             logger.error(f"Anthropic API error: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
-            raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
+                raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
