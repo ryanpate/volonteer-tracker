@@ -303,18 +303,18 @@ Please provide a warm, pastoral summary that helps leadership understand where t
 
                 return response.choices[0].message.content
 
-            except TypeError as e:
-                # Handle version incompatibility
-                if "'proxies'" in str(e):
-                    logger.error(f"OpenAI library version incompatibility: {e}")
-                    raise Exception(
-                        "OpenAI library version incompatibility. Please update to openai>=1.0.0"
-                    )
-                raise
-            except Exception as e:
-                logger.error(f"OpenAI API error: {e}")
+        except TypeError as e:
+            # Handle version incompatibility
+            if "'proxies'" in str(e):
+                logger.error(f"OpenAI library version incompatibility: {e}")
                 raise Exception(
-                    f"Failed to generate summary with OpenAI: {str(e)}")
+                    "OpenAI library version incompatibility. Please update to openai>=1.0.0"
+                )
+            raise
+        except Exception as e:
+            logger.error(f"OpenAI API error: {e}")
+            raise Exception(
+                f"Failed to generate summary with OpenAI: {str(e)}")
       
     def _generate_with_anthropic(self, prompt):
         """Generate summary using Anthropic Claude"""
