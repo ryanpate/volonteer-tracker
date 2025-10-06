@@ -36,7 +36,7 @@ export default function Layout() {
             <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200" style={{ background: 'linear-gradient(135deg, #9AAF92 0%, #6B8263 100%)' }}>
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-                  <span className="text-white text-xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>CH</span>
+                  <span className="text-white text-xl font-bold" style={{ fontFamily: "'Brandon Grotesque', sans-serif" }}>ch</span>
                 </div>
                 <span className="text-lg font-bold text-white">Volunteer Tracker</span>
               </div>
@@ -71,7 +71,7 @@ export default function Layout() {
           <div className="flex items-center h-16 px-4 border-b border-gray-200" style={{ background: 'linear-gradient(135deg, #9AAF92 0%, #6B8263 100%)' }}>
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-                <span className="text-white text-xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>CH</span>
+                <span className="text-white text-xl font-bold" style={{ fontFamily: "'Brandon Grotesque', sans-serif" }}>ch</span>
               </div>
               <div>
                 <div className="text-sm font-bold text-white leading-tight">Volunteer Tracker</div>
@@ -143,7 +143,7 @@ export default function Layout() {
           <div className="flex-1 flex items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#9AAF92] to-[#6B8263] flex items-center justify-center">
-                <span className="text-white text-sm font-bold" style={{ fontFamily: 'Georgia, serif' }}>CH</span>
+                <span className="text-white text-sm font-bold" style={{ fontFamily: "'Brandon Grotesque', sans-serif" }}>ch</span>
               </div>
               <span className="text-base font-semibold text-gray-900">Volunteer Tracker</span>
             </div>
