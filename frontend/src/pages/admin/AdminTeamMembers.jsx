@@ -77,18 +77,34 @@ export default function AdminTeamMembers() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const dataToSend = { ...formData };
+      
+      // Don't send password field if it's empty during edit
+      if (editingMember && !dataToSend.password) {
+        delete dataToSend.password;
+      }
+      
+      console.log('Submitting data:', dataToSend);
+      
       if (editingMember) {
-        await teamAPI.update(editingMember.id, formData);
+        await teamAPI.update(editingMember.id, dataToSend);
         alert('Team member updated successfully');
       } else {
-        await teamAPI.create(formData);
+        await teamAPI.create(dataToSend);
         alert('Team member created successfully');
       }
       handleCloseModal();
       loadTeamMembers();
     } catch (error) {
       console.error('Error saving team member:', error);
-      alert('Failed to save team member: ' + (error.response?.data?.detail || error.message));
+      console.error('Response data:', error.response?.data);
+      console.error('Response status:', error.response?.status);
+      console.error('Request data:', error.config?.data);
+      
+      const errorMessage = error.response?.data?.detail 
+        || JSON.stringify(error.response?.data)
+        || error.message;
+      alert('Failed to save team member: ' + errorMessage);
     }
   };
 
