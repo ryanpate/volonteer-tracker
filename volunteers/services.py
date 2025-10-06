@@ -275,47 +275,26 @@ Please provide a warm, pastoral summary that helps leadership understand where t
     def _generate_with_openai(self, prompt):
         """Generate summary using OpenAI"""
         try:
-                from openai import OpenAI
+            from openai import OpenAI
 
-                # Initialize client with minimal parameters
-                # This works with openai>=1.0.0
-                client = OpenAI(
-                    api_key=settings.OPENAI_API_KEY,
-                    # Don't pass proxies - not supported in newer versions
-                )
+            client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-                response = client.chat.completions.create(
-                    # Using gpt-4o-mini (cheaper and faster than gpt-4)
-                    model="gpt-4o-mini",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are a helpful assistant for church worship arts leadership."
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ],
-                    max_tokens=800,
-                    temperature=0.7
-                )
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant for church worship arts leadership."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=800,
+                temperature=0.7
+            )
 
-                return response.choices[0].message.content
+            return response.choices[0].message.content
 
-        except TypeError as e:
-            # Handle version incompatibility
-            if "'proxies'" in str(e):
-                logger.error(f"OpenAI library version incompatibility: {e}")
-                raise Exception(
-                    "OpenAI library version incompatibility. Please update to openai>=1.0.0"
-                )
-            raise
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
-            raise Exception(
-                f"Failed to generate summary with OpenAI: {str(e)}")
-      
+            raise Exception(f"Failed to generate summary with OpenAI: {str(e)}")
+    
     def _generate_with_anthropic(self, prompt):
         """Generate summary using Anthropic Claude"""
         try:
