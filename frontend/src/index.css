@@ -86,8 +86,13 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
+  @reference {
     @apply bg-gray-50 text-gray-900;
+  }
+
+  body {
+    background-color: #f9fafb;
+    color: #111827;
     font-family: 'Brandon Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   }
 
