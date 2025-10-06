@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Brandon Grotesque Font Face Declarations */
 @font-face {
   font-family: 'Brandon Grotesque';
@@ -83,8 +85,6 @@
   font-style: italic;
 }
 
-@import "tailwindcss";
-
 @layer base {
   body {
     background-color: #f9fafb;
@@ -158,8 +158,7 @@
   }
 
   .input:focus {
-    ring: 2px;
-    ring-color: #3b82f6;
+    box-shadow: 0 0 0 2px #3b82f6;
     border-color: transparent;
   }
 
