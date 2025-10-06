@@ -40,7 +40,7 @@ export default function Login() {
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#9AAF92] to-[#6B8263] mb-4 shadow-lg">
-            <span className="text-white text-5xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
+            <span className="text-white text-5xl font-bold" style={{ fontFamily: "'Brandon Grotesque', sans-serif" }}>
               ch
             </span>
           </div>
@@ -48,14 +48,14 @@ export default function Login() {
             background: 'linear-gradient(135deg, #9AAF92 0%, #6B8263 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            fontFamily: "'Brandon Grotesque', sans-serif"
           }}>
             Volunteer Tracker
           </h1>
           <p className="text-gray-600 font-medium">Cherry Hills Church</p>
           <p className="text-sm text-gray-500 mt-1">Worship Arts Team Leadership Portal</p>
         </div>
-
         {/* Login Card */}
         <div className="login-card">
           <div className="mb-6 text-center">
