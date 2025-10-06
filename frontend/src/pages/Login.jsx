@@ -41,7 +41,7 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#9AAF92] to-[#6B8263] mb-4 shadow-lg">
             <span className="text-white text-5xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
-              CH
+              ch
             </span>
           </div>
           <h1 className="text-4xl font-bold mb-2" style={{ 
@@ -78,7 +78,8 @@ export default function Login() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="input pl-10"
+                  className="input"
+                  style={{ paddingLeft: '2.75rem' }}
                   placeholder="Enter your username"
                   required
                   autoComplete="username"
@@ -94,7 +95,8 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input pl-10"
+                  className="input"
+                  style={{ paddingLeft: '2.75rem' }}
                   placeholder="Enter your password"
                   required
                   autoComplete="current-password"
