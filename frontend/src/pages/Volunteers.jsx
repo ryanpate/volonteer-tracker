@@ -75,7 +75,8 @@ export default function Volunteers() {
             placeholder="Search volunteers by name, email, or phone..."
             value={search}
             onChange={handleSearch}
-            className="input pl-10"
+            className="input"
+            style={{ paddingLeft: '2.75rem' }}
           />
         </div>
       </div>
