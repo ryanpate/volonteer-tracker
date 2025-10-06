@@ -61,47 +61,47 @@ export default function Dashboard() {
   }
 
   const stats = [
-      { 
-        name: 'Total Volunteers', 
-        value: overview?.total_volunteers || 0, 
-        icon: FiUsers, 
-        color: 'bg-[#3B7EA1]',
-        accentClass: 'accent-blue',
-        link: '/volunteers'
-      },
-      { 
-        name: 'Total Interactions', 
-        value: overview?.total_interactions || 0, 
-        icon: FiMessageSquare, 
-        color: 'bg-[#2A8B88]',
-        accentClass: 'accent-teal',
-        link: '/interactions'
-      },
-      { 
-        name: 'This Month', 
-        value: overview?.interactions_this_month || 0, 
-        icon: FiTrendingUp, 
-        color: 'bg-[#B25667]',
-        accentClass: 'accent-rose',
-        link: '/interactions?filter=this-month'
-      },
-      { 
-        name: 'Pending Follow-ups', 
-        value: overview?.pending_followups || 0, 
-        icon: FiClock, 
-        color: 'bg-[#F0B545]',
-        accentClass: 'accent-gold',
-        link: '/interactions?filter=followup'
-      },
-      { 
-        name: 'Overdue', 
-        value: overview?.overdue_followups || 0, 
-        icon: FiAlertCircle, 
-        color: 'bg-[#C55A5A]',
-        accentClass: 'accent-rose',
-        link: '/interactions?filter=overdue'
-      },
-    ];
+    { 
+      name: 'Total Volunteers', 
+      value: overview?.total_volunteers || 0, 
+      icon: FiUsers, 
+      color: 'bg-[#3B7EA1]',
+      accentClass: 'accent-blue',
+      link: '/volunteers'
+    },
+    { 
+      name: 'Total Interactions', 
+      value: overview?.total_interactions || 0, 
+      icon: FiMessageSquare, 
+      color: 'bg-[#2A8B88]',
+      accentClass: 'accent-teal',
+      link: '/interactions'
+    },
+    { 
+      name: 'This Month', 
+      value: overview?.interactions_this_month || 0, 
+      icon: FiTrendingUp, 
+      color: 'bg-[#B25667]',
+      accentClass: 'accent-rose',
+      link: '/interactions?filter=this-month'
+    },
+    { 
+      name: 'Pending Follow-ups', 
+      value: overview?.pending_followups || 0, 
+      icon: FiClock, 
+      color: 'bg-[#F0B545]',
+      accentClass: 'accent-gold',
+      link: '/interactions?filter=followup'
+    },
+    { 
+      name: 'Overdue', 
+      value: overview?.overdue_followups || 0, 
+      icon: FiAlertCircle, 
+      color: 'bg-[#C55A5A]',
+      accentClass: 'accent-rose',
+      link: '/interactions?filter=overdue'
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -134,7 +134,11 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => (
-          <div key={stat.name} className={`stat-card ${stat.accentClass}`}>
+          <Link 
+            key={stat.name} 
+            to={stat.link}
+            className={`stat-card ${stat.accentClass} transition-all hover:shadow-lg hover:scale-105 cursor-pointer`}
+          >
             <div className="flex items-center">
               <div className={`${stat.color} p-3 rounded-lg shadow-sm`}>
                 <stat.icon className="h-6 w-6 text-white" />
@@ -144,7 +148,7 @@ export default function Dashboard() {
                 <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
