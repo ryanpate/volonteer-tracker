@@ -1,10 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
-from django.http import HttpResponse
-from django.conf import settings
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-import os
 
 from core.views import TeamMemberViewSet, AuthViewSet
 from core.admin_views import AdminDashboardViewSet, SettingsView
@@ -32,18 +29,6 @@ router.register(r'admin/dashboard', AdminDashboardViewSet,
                 basename='admin-dashboard')
 router.register(r'admin/interactions', InteractionAdminViewSet,
                 basename='admin-interaction')
-
-# View to serve React app
-
-
-def serve_react(request):
-    try:
-        index_path = os.path.join(settings.STATIC_ROOT, 'index.html')
-        with open(index_path) as f:
-            return HttpResponse(f.read(), content_type='text/html')
-    except FileNotFoundError:
-        return HttpResponse('Frontend build not found. Please run the build process.', status=404)
-
 
 urlpatterns = [
     # Django Admin
@@ -80,7 +65,4 @@ urlpatterns = [
     # Health check
     path('health/',
          lambda request: __import__('django.http').JsonResponse({'status': 'ok'})),
-
-    # Serve React App - MUST be last to catch all remaining routes
-    re_path(r'^.*$', serve_react, name='frontend'),
 ]

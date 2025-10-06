@@ -104,11 +104,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# Static files (for Django admin only)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'frontend' /
-                    'dist'] if (BASE_DIR / 'frontend' / 'dist').exists() else []
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -146,17 +144,23 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# CORS settings
+# CORS settings - Allow frontend from Netlify
 CORS_ALLOWED_ORIGINS_LIST = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173'
 ).split(',')
 
+# Allow Railway domain
 if railway_domain:
     CORS_ALLOWED_ORIGINS_LIST.extend([
         f'https://{railway_domain}',
         f'http://{railway_domain}'
     ])
+
+# Allow Netlify domain - add this as environment variable after Netlify deployment
+netlify_url = os.environ.get('NETLIFY_URL')
+if netlify_url:
+    CORS_ALLOWED_ORIGINS_LIST.append(netlify_url)
 
 CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS_LIST
 CORS_ALLOW_CREDENTIALS = True
