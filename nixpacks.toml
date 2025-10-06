@@ -6,8 +6,7 @@ cmds = [
   "rm -rf /opt/venv || true",
   "python -m venv --copies /opt/venv",
   "/opt/venv/bin/pip install --upgrade pip",
-  "/opt/venv/bin/pip install --no-cache-dir --force-reinstall anthropic==0.15.0 openai==1.52.0",
-  "/opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
+  "/opt/venv/bin/pip install --no-cache-dir --force-reinstall -r requirements.txt"
 ]
 
 [start]
