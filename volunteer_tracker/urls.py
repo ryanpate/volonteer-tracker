@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -29,6 +30,13 @@ router.register(r'admin/dashboard', AdminDashboardViewSet,
                 basename='admin-dashboard')
 router.register(r'admin/interactions', InteractionAdminViewSet,
                 basename='admin-interaction')
+
+# Health check view
+
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'})
+
 
 urlpatterns = [
     # Django Admin
@@ -63,6 +71,5 @@ urlpatterns = [
          DashboardEngagementMetricsView.as_view(), name='dashboard-engagement-metrics'),
 
     # Health check
-    path('health/',
-         lambda request: __import__('django.http').JsonResponse({'status': 'ok'})),
+    path('health/', health_check, name='health'),
 ]
