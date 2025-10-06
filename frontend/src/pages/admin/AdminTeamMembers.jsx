@@ -15,6 +15,7 @@ export default function AdminTeamMembers() {
     role: 'member',
     is_active: true,
     password: '',
+    password_confirm: '',
   });
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function AdminTeamMembers() {
         role: member.role || 'member',
         is_active: member.is_active,
         password: '',
+        password_confirm: '',
       });
     } else {
       setEditingMember(null);
@@ -55,6 +57,7 @@ export default function AdminTeamMembers() {
         role: 'member',
         is_active: true,
         password: '',
+        password_confirm: '',
       });
     }
     setShowModal(true);
@@ -71,6 +74,7 @@ export default function AdminTeamMembers() {
       role: 'member',
       is_active: true,
       password: '',
+      password_confirm: '',
     });
   };
 
@@ -79,9 +83,16 @@ export default function AdminTeamMembers() {
     try {
       const dataToSend = { ...formData };
       
-      // Don't send password field if it's empty during edit
+      // Check if passwords match when creating a new user
+      if (!editingMember && dataToSend.password !== dataToSend.password_confirm) {
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      // Don't send password fields if it's empty during edit
       if (editingMember && !dataToSend.password) {
         delete dataToSend.password;
+        delete dataToSend.password_confirm;
       }
       
       console.log('Submitting data:', dataToSend);
@@ -280,17 +291,30 @@ export default function AdminTeamMembers() {
                 </div>
 
                 {!editingMember && (
-                  <div>
-                    <label className="label">Password *</label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="input"
-                      required={!editingMember}
-                      placeholder="Enter password"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="label">Password *</label>
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="input"
+                        required={!editingMember}
+                        placeholder="Enter password"
+                      />
+                    </div>
+                    <div>
+                      <label className="label">Confirm Password *</label>
+                      <input
+                        type="password"
+                        value={formData.password_confirm}
+                        onChange={(e) => setFormData({ ...formData, password_confirm: e.target.value })}
+                        className="input"
+                        required={!editingMember}
+                        placeholder="Confirm password"
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div>
