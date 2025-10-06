@@ -275,9 +275,21 @@ Please provide a warm, pastoral summary that helps leadership understand where t
     def _generate_with_openai(self, prompt):
         """Generate summary using OpenAI"""
         try:
+            import openai
+            logger.info(f"OpenAI version: {openai.__version__}")
+
             from openai import OpenAI
 
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            # Log what we're about to do
+            logger.info("Creating OpenAI client...")
+
+            # Create client with explicit parameters only
+            client = OpenAI(
+                api_key=settings.OPENAI_API_KEY,
+                timeout=30.0,
+            )
+
+            logger.info("Client created successfully, making API call...")
 
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -289,18 +301,34 @@ Please provide a warm, pastoral summary that helps leadership understand where t
                 temperature=0.7
             )
 
+            logger.info("API call successful")
             return response.choices[0].message.content
 
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
+            logger.error(f"Error type: {type(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             raise Exception(f"Failed to generate summary with OpenAI: {str(e)}")
-    
+        
+
     def _generate_with_anthropic(self, prompt):
         """Generate summary using Anthropic Claude"""
         try:
             import anthropic
 
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            logger.info(f"Anthropic version: {anthropic.__version__}")
+            logger.info("Creating Anthropic client...")
+
+            # Create client with minimal parameters
+            client = anthropic.Anthropic(
+                api_key=settings.ANTHROPIC_API_KEY,
+                # Explicitly set defaults to override any environment configs
+                max_retries=2,
+                timeout=60.0,
+            )
+
+            logger.info("Client created, making API call...")
 
             message = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
@@ -313,9 +341,12 @@ Please provide a warm, pastoral summary that helps leadership understand where t
                 ]
             )
 
+            logger.info("API call successful")
             return message.content[0].text
 
         except Exception as e:
             logger.error(f"Anthropic API error: {e}")
-            raise Exception(
-                f"Failed to generate summary with Anthropic: {str(e)}")
+            logger.error(f"Error type: {type(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
