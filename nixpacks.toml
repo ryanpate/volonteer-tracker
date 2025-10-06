@@ -2,21 +2,17 @@
 nixPkgs = ["python312", "nodejs_20"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = [
+  "python -m venv --copies /opt/venv",
+  "/opt/venv/bin/pip install -r requirements.txt"
+]
 
 [phases.build]
 cmds = [
-    "echo '=== Building frontend ==='",
-    "cd frontend && npm install && npm run build && cd ..",
-    "echo '=== Frontend dist contents ==='",
-    "ls -la frontend/dist/ || echo 'dist directory not found'",
-    "echo '=== Running collectstatic ==='",
-    "python manage.py collectstatic --noinput --clear",
-    "echo '=== Copying frontend to staticfiles ==='",
-    "cp -rv frontend/dist/* staticfiles/ || echo 'Copy failed'",
-    "echo '=== Final staticfiles contents ==='",
-    "ls -la staticfiles/ || echo 'staticfiles directory not found'"
+  "cd frontend && npm install && npm run build && cd ..",
+  "/opt/venv/bin/python manage.py collectstatic --noinput --clear",
+  "cp -r frontend/dist/* staticfiles/"
 ]
 
 [start]
-cmd = "python manage.py migrate && gunicorn volunteer_tracker.wsgi:application --bind 0.0.0.0:$PORT"
+cmd = "/opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn volunteer_tracker.wsgi:application --bind 0.0.0.0:$PORT"
