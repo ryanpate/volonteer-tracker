@@ -316,29 +316,33 @@ Please provide a warm, pastoral summary that helps leadership understand where t
         """Generate summary using Anthropic Claude"""
         try:
             import anthropic
+            import httpx
 
             logger.info(f"Anthropic version: {anthropic.__version__}")
-            logger.info("Creating Anthropic client...")
+            logger.info("Creating custom HTTP client...")
 
-            # Create client with minimal parameters
-            client = anthropic.Anthropic(
-                api_key=settings.ANTHROPIC_API_KEY,
-                # Explicitly set defaults to override any environment configs
-                max_retries=2,
+            # Create a custom httpx client that ignores environment proxy settings
+            http_client = httpx.Client(
                 timeout=60.0,
+                # Explicitly disable proxy detection from environment
+                proxies=None,
+                trust_env=False  # Don't trust environment variables
             )
 
-            logger.info("Client created, making API call...")
+            logger.info("Creating Anthropic client with custom HTTP client...")
+
+            client = anthropic.Anthropic(
+                api_key=settings.ANTHROPIC_API_KEY,
+                http_client=http_client,
+                max_retries=2,
+            )
+
+            logger.info("Making API call...")
 
             message = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=1024,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
+                messages=[{"role": "user", "content": prompt}]
             )
 
             logger.info("API call successful")
@@ -346,7 +350,6 @@ Please provide a warm, pastoral summary that helps leadership understand where t
 
         except Exception as e:
             logger.error(f"Anthropic API error: {e}")
-            logger.error(f"Error type: {type(e)}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise Exception(f"Failed to generate summary with Anthropic: {str(e)}")
