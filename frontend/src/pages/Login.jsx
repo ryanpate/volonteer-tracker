@@ -128,7 +128,7 @@ export default function Login() {
               Track volunteer interactions and build stronger connections in your ministry
             </p>
             <p className="text-xs text-gray-500 mt-3 italic">
-              "Pursuing life together with Jesus in community, in formation, and on mission"
+              "Creating something beautiful for the people we love, to encounter the God we love."
             </p>
           </div>
         </div>

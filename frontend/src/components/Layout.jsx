@@ -163,7 +163,7 @@ export default function Layout() {
         <footer className="mt-auto py-6 border-t border-gray-200 bg-white">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-sm text-gray-600 italic leading-relaxed">
-              "Pursuing life together with Jesus in community, in formation, and on mission"
+              "Creating something beautiful for the people we love, to encounter the God we love."
             </p>
             <p className="mt-2 text-xs text-gray-500">
               © {new Date().getFullYear()} Cherry Hills Church | 
