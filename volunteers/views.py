@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Count, Max
+from django.db.models import Q
 from .models import Volunteer
 from .serializers import (
     VolunteerSerializer, VolunteerCreateSerializer,
@@ -32,10 +32,7 @@ class VolunteerViewSet(viewsets.ModelViewSet):
         Return volunteers, excluding archived by default
         Use ?show_archived=true to include archived volunteers
         """
-        queryset = Volunteer.objects.annotate(
-            interaction_count=Count('interactions'),
-            last_interaction_date=Max('interactions__interaction_date')
-        )
+        queryset = Volunteer.objects.all()
 
         # Check if we should show archived volunteers
         show_archived = self.request.query_params.get(
