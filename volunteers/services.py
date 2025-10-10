@@ -15,20 +15,20 @@ class PCOService:
         self.auth = (settings.PCO_APP_ID, settings.PCO_SECRET)
 
     def sync_volunteers(self):
-        """Sync all ACTIVE volunteers from PCO Services (excludes archived)"""
+        """Sync all volunteers from PCO Services and capture their status"""
         results = {
             'synced': 0,
             'updated': 0,
-            'skipped_archived': 0,
+            'archived': 0,
             'errors': []
         }
 
         try:
-            logger.info('Starting PCO volunteer sync (active only)...')
+            logger.info('Starting PCO volunteer sync...')
 
             all_people = []
-            # Updated to filter for active status and exclude archived
-            next_url = f'{self.base_url}/services/v2/people?per_page=100&where[status]=active&include=emails,phone_numbers,addresses'
+            # Fetch all people (both active and archived) so we can update status
+            next_url = f'{self.base_url}/services/v2/people?per_page=100&include=emails,phone_numbers,addresses'
 
             while next_url:
                 try:
@@ -41,19 +41,17 @@ class PCOService:
 
                     for person in people:
                         try:
-                            # Double-check status attribute (some PCO APIs use 'attributes.status')
-                            person_status = person.get('attributes', {}).get('status')
-                            
-                            # Skip if explicitly archived
-                            if person_status and person_status.lower() == 'archived':
-                                results['skipped_archived'] += 1
-                                logger.debug(f"Skipping archived person: {person.get('id')}")
-                                continue
-                            
-                            person_data = self._extract_person_data(person, included)
+                            person_data = self._extract_person_data(
+                                person, included)
                             all_people.append(person_data)
+
+                            # Track archived count
+                            if person_data.get('is_archived'):
+                                results['archived'] += 1
+
                         except Exception as e:
-                            logger.error(f"Error processing person {person.get('id')}: {e}")
+                            logger.error(
+                                f"Error processing person {person.get('id')}: {e}")
                             results['errors'].append({
                                 'id': person.get('id'),
                                 'error': str(e)
@@ -71,7 +69,8 @@ class PCOService:
                     })
                     break
 
-            logger.info(f"Fetched {len(all_people)} active people from PCO (skipped {results['skipped_archived']} archived)")
+            logger.info(
+                f"Fetched {len(all_people)} people from PCO ({results['archived']} archived)")
 
             # Update database
             for person_data in all_people:
@@ -85,6 +84,8 @@ class PCOService:
                             'phone': person_data.get('phone'),
                             'address': person_data.get('address'),
                             'teams': person_data.get('teams', []),
+                            'status': person_data.get('status', 'active'),
+                            'is_archived': person_data.get('is_archived', False),
                             'last_synced_at': timezone.now(),
                         }
                     )
@@ -95,7 +96,8 @@ class PCOService:
                         results['updated'] += 1
 
                 except Exception as e:
-                    logger.error(f"Error saving volunteer {person_data['pco_person_id']}: {e}")
+                    logger.error(
+                        f"Error saving volunteer {person_data['pco_person_id']}: {e}")
                     results['errors'].append({
                         'id': person_data['pco_person_id'],
                         'error': str(e)
@@ -103,7 +105,7 @@ class PCOService:
 
             logger.info(
                 f"Sync complete: {results['synced']} new, {results['updated']} updated, "
-                f"{results['skipped_archived']} archived skipped, {len(results['errors'])} errors"
+                f"{results['archived']} archived, {len(results['errors'])} errors"
             )
             return results
 
@@ -116,15 +118,27 @@ class PCOService:
             return results
 
     def _extract_person_data(self, person, included):
-        """Extract person data from PCO response"""
+        """Extract person data from PCO response including status"""
         attributes = person.get('attributes', {})
         relationships = person.get('relationships', {})
+
+        # Get status - PCO may use 'status' or 'archived' attribute
+        status = attributes.get('status', 'active')
+        archived = attributes.get('archived', False)
+
+        # Determine if archived
+        is_archived = (
+            status and status.lower() == 'archived' or
+            archived is True
+        )
 
         # Basic info
         person_data = {
             'pco_person_id': person['id'],
             'first_name': attributes.get('first_name', ''),
             'last_name': attributes.get('last_name', ''),
+            'status': 'archived' if is_archived else 'active',
+            'is_archived': is_archived,
         }
 
         # Extract email from included data
@@ -132,8 +146,8 @@ class PCOService:
         if emails_data:
             email_id = emails_data[0]['id']
             email_obj = next(
-                (item for item in included if item['type'] ==
-                 'Email' and item['id'] == email_id),
+                (item for item in included if item['type']
+                 == 'Email' and item['id'] == email_id),
                 None
             )
             if email_obj:
@@ -158,8 +172,8 @@ class PCOService:
         if address_data:
             address_id = address_data[0]['id']
             address_obj = next(
-                (item for item in included if item['type'] ==
-                 'Address' and item['id'] == address_id),
+                (item for item in included if item['type']
+                 == 'Address' and item['id'] == address_id),
                 None
             )
             if address_obj:
@@ -170,8 +184,7 @@ class PCOService:
                     addr_attrs.get('state'),
                     addr_attrs.get('zip')
                 ]
-                person_data['address'] = ', '.join(
-                    filter(None, address_parts))
+                person_data['address'] = ', '.join(filter(None, address_parts))
 
         return person_data
 
@@ -187,8 +200,8 @@ class PCOService:
             included = data.get('included', [])
 
             for membership in data.get('data', []):
-                team_rel = membership.get(
-                    'relationships', {}).get('team', {}).get('data')
+                team_rel = membership.get('relationships', {}).get(
+                    'team', {}).get('data')
                 if team_rel:
                     team_id = team_rel['id']
                     team_obj = next(
@@ -197,8 +210,7 @@ class PCOService:
                         None
                     )
                     if team_obj:
-                        team_name = team_obj.get(
-                            'attributes', {}).get('name')
+                        team_name = team_obj.get('attributes', {}).get('name')
                         if team_name:
                             teams.append(team_name)
 
@@ -211,8 +223,7 @@ class PCOService:
     def test_connection(self):
         """Test connection to PCO API"""
         try:
-            # Test with active people only
-            url = f'{self.base_url}/services/v2/people?per_page=1&where[status]=active'
+            url = f'{self.base_url}/services/v2/people?per_page=1'
             response = requests.get(url, auth=self.auth)
             response.raise_for_status()
 

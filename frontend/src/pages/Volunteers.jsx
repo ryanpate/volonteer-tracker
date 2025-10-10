@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { volunteersAPI } from '../services/api';
-import { FiSearch, FiPhone, FiMail, FiMessageSquare, FiUsers } from 'react-icons/fi';
+import { FiSearch, FiPhone, FiMail, FiMessageSquare, FiUsers, FiEye, FiEyeOff } from 'react-icons/fi';
 import { format } from 'date-fns';
 
 export default function Volunteers() {
@@ -10,15 +10,21 @@ export default function Volunteers() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [showArchived, setShowArchived] = useState(false); // NEW: Toggle for archived
 
   useEffect(() => {
     loadVolunteers();
-  }, [page, search]);
+  }, [page, search, showArchived]); // NEW: Reload when showArchived changes
 
   const loadVolunteers = async () => {
     setLoading(true);
     try {
-      const response = await volunteersAPI.getAll({ page, search });
+      // NEW: Pass showArchived parameter to API
+      const response = await volunteersAPI.getAll({ 
+        page, 
+        search,
+        show_archived: showArchived 
+      });
       setVolunteers(response.data.results || []);
       setPagination({
         total: response.data.count,
@@ -57,7 +63,8 @@ export default function Volunteers() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Volunteers</h1>
             <p className="text-gray-600 mt-1">
-              {pagination?.total || 0} volunteer{pagination?.total !== 1 ? 's' : ''} in your ministry
+              {pagination?.total || 0} volunteer{pagination?.total !== 1 ? 's' : ''} 
+              {showArchived ? ' (including archived)' : ' (active only)'}
             </p>
           </div>
         </div>
@@ -66,18 +73,41 @@ export default function Volunteers() {
         </Link>
       </div>
 
-      {/* Search */}
+      {/* Search and Filter Bar */}
       <div className="card">
-        <div className="relative">
-          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search volunteers by name, email, or phone..."
-            value={search}
-            onChange={handleSearch}
-            className="input"
-            style={{ paddingLeft: '2.75rem' }}
-          />
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search volunteers by name, email, or phone..."
+              value={search}
+              onChange={handleSearch}
+              className="input"
+              style={{ paddingLeft: '2.75rem' }}
+            />
+          </div>
+          
+          {/* NEW: Show Archived Toggle */}
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`btn-secondary flex items-center gap-2 whitespace-nowrap ${
+              showArchived ? 'bg-gray-300' : ''
+            }`}
+          >
+            {showArchived ? (
+              <>
+                <FiEyeOff className="h-4 w-4" />
+                Hide Archived
+              </>
+            ) : (
+              <>
+                <FiEye className="h-4 w-4" />
+                Show Archived
+              </>
+            )}
+          </button>
         </div>
       </div>
 
@@ -87,13 +117,23 @@ export default function Volunteers() {
           <Link
             key={volunteer.id}
             to={`/volunteers/${volunteer.id}`}
-            className="card hover:shadow-lg transition-all duration-200 cursor-pointer group"
+            className={`card hover:shadow-lg transition-all duration-200 cursor-pointer group ${
+              volunteer.is_archived ? 'opacity-60 border-2 border-gray-300' : ''
+            }`}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#9AAF92] transition-colors">
-                  {volunteer.full_name}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#9AAF92] transition-colors">
+                    {volunteer.full_name}
+                  </h3>
+                  {/* NEW: Archived Badge */}
+                  {volunteer.is_archived && (
+                    <span className="badge badge-rose text-xs">
+                      Archived
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                   {volunteer.interaction_count > 0 && (
                     <span className="flex items-center">

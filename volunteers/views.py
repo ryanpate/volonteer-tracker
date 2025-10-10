@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q, Count, Max
 from .models import Volunteer
 from .serializers import (
     VolunteerSerializer, VolunteerCreateSerializer,
@@ -14,17 +15,37 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class VolunteerViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing volunteers
     """
-    queryset = Volunteer.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['first_name', 'last_name', 'email']
+    search_fields = ['first_name', 'last_name', 'email', 'phone']
     ordering_fields = ['last_name', 'first_name', 'created_at']
     ordering = ['last_name', 'first_name']
+
+    def get_queryset(self):
+        """
+        Return volunteers, excluding archived by default
+        Use ?show_archived=true to include archived volunteers
+        """
+        queryset = Volunteer.objects.annotate(
+            interaction_count=Count('interactions'),
+            last_interaction_date=Max('interactions__interaction_date')
+        )
+
+        # Check if we should show archived volunteers
+        show_archived = self.request.query_params.get(
+            'show_archived', 'false').lower() == 'true'
+
+        if not show_archived:
+            # Default: only show active volunteers
+            queryset = queryset.filter(is_archived=False)
+
+        return queryset.order_by('last_name', 'first_name')
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -35,23 +56,45 @@ class VolunteerViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def history(self, request, pk=None):
-        """Get volunteer interaction history"""
+        """Get volunteer with interaction history"""
         volunteer = self.get_object()
-        interactions = volunteer.interactions.all()
-        serializer = InteractionSerializer(interactions, many=True)
-        return Response({
-            'volunteer': VolunteerSerializer(volunteer).data,
-            'interactions': serializer.data
-        })
+        interactions = volunteer.interactions.select_related(
+            'team_member').order_by('-interaction_date')
 
+        interaction_data = []
+        for interaction in interactions:
+            interaction_data.append({
+                'id': interaction.id,
+                'interaction_date': interaction.interaction_date,
+                'discussion_notes': interaction.discussion_notes,
+                'topics': interaction.topics,
+                'needs_followup': interaction.needs_followup,
+                'followup_date': interaction.followup_date,
+                'followup_notes': interaction.followup_notes,
+                'followup_completed': interaction.followup_completed,
+                'team_member_first_name': interaction.team_member.first_name,
+                'team_member_last_name': interaction.team_member.last_name,
+            })
+
+        serializer = VolunteerSerializer(volunteer)
+        return Response({
+            'volunteer': serializer.data,
+            'interactions': interaction_data
+        })
 
     @action(detail=True, methods=['get'])
     def teams(self, request, pk=None):
-        """Fetch and cache teams for a specific volunteer from PCO"""
+        """Fetch and update teams for a specific volunteer from PCO"""
         volunteer = self.get_object()
 
+        if not volunteer.pco_person_id:
+            return Response(
+                {'error': 'This volunteer is not synced with PCO'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         logger.info(
-            f"=== Fetching teams for volunteer {volunteer.full_name} (PCO ID: {volunteer.pco_person_id}) ===")
+            f"Fetching teams for volunteer {volunteer.full_name} (PCO ID: {volunteer.pco_person_id})")
 
         try:
             pco_service = PCOService()
@@ -72,7 +115,7 @@ class VolunteerViewSet(viewsets.ModelViewSet):
                 {'error': f'Failed to fetch teams: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-    
+
     @action(detail=True, methods=['get'])
     def summary(self, request, pk=None):
         """Generate AI summary of volunteer interactions"""
