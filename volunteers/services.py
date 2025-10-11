@@ -308,15 +308,30 @@ Provide a brief, well-organized summary (2-3 paragraphs max)."""
     def _summarize_with_anthropic(self, prompt):
         """Use Anthropic Claude to generate summary"""
         import anthropic
+        import httpx
 
-        client = anthropic.Anthropic(api_key=self.anthropic_key)
-
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=500,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        # Create httpx client without proxy auto-detection
+        # This prevents the 'proxies' error in containerized environments
+        http_client = httpx.Client(
+            proxies=None,  # Explicitly disable proxies
+            timeout=60.0
         )
 
-        return message.content[0].text
+        try:
+            client = anthropic.Anthropic(
+                api_key=self.anthropic_key,
+                http_client=http_client
+            )
+
+            message = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=500,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+
+            return message.content[0].text
+        finally:
+            # Clean up the http client
+            http_client.close()
