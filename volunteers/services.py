@@ -305,33 +305,47 @@ Provide a brief, well-organized summary (2-3 paragraphs max)."""
 
         return response.choices[0].message.content
 
+
     def _summarize_with_anthropic(self, prompt):
         """Use Anthropic Claude to generate summary"""
         import anthropic
         import httpx
+        import os
 
-        # Create httpx client without proxy auto-detection
-        # This prevents the 'proxies' error in containerized environments
-        http_client = httpx.Client(
-            proxies=None,  # Explicitly disable proxies
-            timeout=60.0
-        )
+        # Save current proxy environment variables
+        saved_env = {}
+        proxy_vars = ['HTTP_PROXY', 'HTTPS_PROXY',
+                    'http_proxy', 'https_proxy', 'NO_PROXY', 'no_proxy']
+        for var in proxy_vars:
+            if var in os.environ:
+                saved_env[var] = os.environ[var]
+                del os.environ[var]
 
         try:
-            client = anthropic.Anthropic(
-                api_key=self.anthropic_key,
-                http_client=http_client
+            # Create httpx client with trust_env=False to ignore environment proxies
+            http_client = httpx.Client(
+                trust_env=False,  # Don't trust environment variables for proxy config
+                timeout=60.0
             )
 
-            message = client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=500,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            )
+            try:
+                client = anthropic.Anthropic(
+                    api_key=self.anthropic_key,
+                    http_client=http_client
+                )
 
-            return message.content[0].text
+                message = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=500,
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+
+                return message.content[0].text
+            finally:
+                http_client.close()
         finally:
-            # Clean up the http client
-            http_client.close()
+            # Restore saved environment variables
+            for var, value in saved_env.items():
+            os.environ[var] = value
