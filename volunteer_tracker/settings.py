@@ -4,6 +4,10 @@ from datetime import timedelta
 import dj_database_url
 from dotenv import load_dotenv
 
+os.environ.pop('HTTP_PROXY', None)
+os.environ.pop('HTTPS_PROXY', None)
+os.environ.pop('NO_PROXY', None)
+
 # Load environment variables from .env file
 load_dotenv()
 
