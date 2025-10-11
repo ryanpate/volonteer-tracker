@@ -348,4 +348,4 @@ Provide a brief, well-organized summary (2-3 paragraphs max)."""
         finally:
             # Restore saved environment variables
             for var, value in saved_env.items():
-            os.environ[var] = value
+                os.environ[var] = value
