@@ -26,3 +26,7 @@ anthropic==0.39.0
 # Production server
 gunicorn==21.2.0
 whitenoise==6.6.0
+
+# Anthropic libraries
+anthropic>=0.18.0
+httpx>=0.24.0
